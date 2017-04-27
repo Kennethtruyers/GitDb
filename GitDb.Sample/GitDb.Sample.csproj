@@ -80,21 +80,19 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="FrontEnd\index.css" />
-    <Content Include="FrontEnd\index.html" />
-    <Content Include="FrontEnd\index.js" />
+    <Content Include="index.css" />
+    <Content Include="index.html" />
+    <Content Include="index.js" />
     <Content Include="Global.asax" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="App_Start\WebApiConfig.cs" />
-    <Compile Include="Controllers\PinController.cs" />
+    <Compile Include="PinController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="NullLogger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
