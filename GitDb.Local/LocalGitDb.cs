@@ -28,7 +28,7 @@ namespace GitDb.Local
         readonly string _path;
         readonly PushOptions _pushOptions;
 
-        public LocalGitDb(string path, ILogger logger, string remoteUrl = null, string userName = null, string userEmail = null, string password = null)
+        public LocalGitDb(string path, ILogger logger, string remoteUrl = null, string userName = null, string userEmail = null, string password = null, bool isBare = true)
         {
             _logger = logger;
             _remoteUrl = string.IsNullOrEmpty(remoteUrl) ? null : remoteUrl;
@@ -52,7 +52,7 @@ namespace GitDb.Local
                 else
                 {
                     _logger.Trace($"No repsotiory exists on disk, initializing a bare repository at {path}");
-                    Repository.Init(path, true);
+                    Repository.Init(path, isBare);
                 }
             }
                 
