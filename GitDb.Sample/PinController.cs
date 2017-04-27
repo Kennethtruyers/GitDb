@@ -16,17 +16,17 @@ namespace GitDb.Sample.Controllers
         public PinController()
         {
             if(_gitDb == null)
-                _gitDb = new LocalGitDb(ConfigurationManager.AppSettings["repoPath"], new NullLogger(), null, "kenneth", "truyers.kenneth@gmail.com", null, false);
+                _gitDb = new LocalGitDb(ConfigurationManager.AppSettings["repoPath"], null, null, "kenneth", "truyers.kenneth@gmail.com", null, false);
         }
 
         [Route("pins")]
         [HttpGet]
-        public async Task<IHttpActionResult> GetPins([FromUri] string branch) =>
+        public async Task<IHttpActionResult> Get([FromUri] string branch) =>
             Ok(await _gitDb.GetFiles<Pin>(branch, "pins"));
 
         [Route("pins")]
         [HttpPost]
-        public IHttpActionResult PostPin([FromUri] string branch, [FromBody] Pin pin)
+        public IHttpActionResult Post([FromUri] string branch, [FromBody] Pin pin)
         {
             pin.Id = Guid.NewGuid().ToString();
             _gitDb.Save(branch, "Created pin " + pin.Name, new Document<Pin> {Key = "pins/" + pin.Id, Value = pin}, _author);
@@ -35,7 +35,7 @@ namespace GitDb.Sample.Controllers
 
         [Route("pins")]
         [HttpPut]
-        public IHttpActionResult PutPin([FromUri] string branch, [FromBody] Pin pin)
+        public IHttpActionResult Put([FromUri] string branch, [FromBody] Pin pin)
         {
             _gitDb.Save(branch, "Created pin " + pin.Name, new Document<Pin> { Key = "pins/" + pin.Id, Value = pin }, _author);
             return Ok();
@@ -43,7 +43,7 @@ namespace GitDb.Sample.Controllers
 
         [Route("pins")]
         [HttpDelete]
-        public IHttpActionResult DeletePin([FromUri] string branch, [FromUri] string id)
+        public IHttpActionResult Delete([FromUri] string branch, [FromUri] string id)
         {
             _gitDb.Delete(branch, "pins/" + id, "Deleted pin with id " + id, _author);
             return Ok();
