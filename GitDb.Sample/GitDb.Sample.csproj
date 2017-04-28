@@ -89,6 +89,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Git.cs" />
     <Compile Include="PinController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>

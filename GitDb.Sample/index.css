@@ -1,5 +1,5 @@
 ﻿#map {
-    height: calc(100vh - 85px);
+    height: calc(100vh - 70px);
 }
 html, body {
     height: 100%;
@@ -14,12 +14,5 @@ html, body {
     color: #fff;
     padding-top: 15px;
     text-align: center;
-    font-size: 1.4em;
-}
-
-#selBranches {
-    height: 50px;
-    width: 150px;
-    margin-left: 50px;
     font-size: 1.4em;
 }

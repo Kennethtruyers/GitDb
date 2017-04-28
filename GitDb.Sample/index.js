@@ -23,6 +23,7 @@ function onStartUp() {
     $select.on("change", onBranchChanged);
 
 }
+
 function onAutoTimerElapsed() {
     if ($autoRefresh.is(":checked"))
         loadData();
@@ -33,48 +34,71 @@ function onBranchChanged() {
     loadData();
 }
 
-
-function loadData() {
-    $.get(getPinsUrl())
-        .done(function (pins) {
-            for (var i = 0; i < markers.length; i++) {
-                markers[i].setMap(null);
-            }
-            markers = [];
-            for (var i = 0; i < pins.length; i++) {
-                addMarker(pins[i]);
-            }
-
-        });
-
-    $.get("/branch")
-     .done(function (branches) {
-            var $select = $("#selBranches");
-            $select.empty();
-            for (var i = 0; i < branches.length; i++) {
-                $select.append($("<option />").val(branches[i])
-                                              .text(branches[i]));
-            }
-            $select.val(branch);
-        });
-}
-
-function onMapClicked (event) {
-    $.post(getPinsUrl(),
-        {
-            name: prompt("Enter the name of the pin"),
+function onMapClicked(event) {
+    var name = prompt("Enter the name of the pin");
+    if (!name) return;
+    $.post(getPinsUrl(), {
+            name: name,
             lat: event.latLng.lat(),
             lng: event.latLng.lng()
         })
         .done(addMarker);
 }
 
-function addMarker(pin)
-{
-    markers.push(new google.maps.Marker({
-        position: pin,
-        map: map,
-        title: pin.name
-    })); 
+function onMarkerClicked() {
+    var name = prompt("Enter the new name", this.data.name);
+    if (name && name !== this.data.name) {
+        this.data.name = name;
+        $.ajax({
+            url: getPinsUrl(),
+            type: "PUT",
+            data: this.data
+        });
+    }
+}
+function onMarkerRightClicked() {
+    var marker = this;
+    if (confirm("Are you sure you want to delete pin " + marker.data.name)) {
+        $.ajax({
+            url: getPinsUrl() + "&id=" + marker.data.id,
+            type: "DELETE"
+        }).done(function() {
+            removeMarker(marker);
+        });
+    }
 }
 
+function loadData() {
+    $.get(getPinsUrl())
+        .done(function (pins) {
+            markers.forEach(removeMarker);
+            pins.forEach(addMarker);
+        });
+
+    $.get("/branch")
+        .done(function (branches) {
+            $select.empty();
+            branches.map(b => $("<option />").val(b).text(b))
+                .forEach(o => $select.append(o));
+            $select.val(branch);
+        });
+}
+
+function addMarker(pin) {
+    var marker = new google.maps.Marker({
+        position: pin,
+        map: map,
+        data: pin
+    });
+    marker.addListener('rightclick', onMarkerRightClicked);
+    marker.addListener('click', onMarkerClicked);
+    markers.push(marker); 
+}
+
+function removeMarker(marker) {
+    marker.setMap(null);
+    var index = markers.indexOf(marker);
+    if (index > -1) {
+        markers.splice(index, 1);
+    }
+}

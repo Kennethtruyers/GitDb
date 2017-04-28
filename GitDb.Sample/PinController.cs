@@ -1,35 +1,26 @@
 ﻿using System;
-using System.Configuration;
 using System.Threading.Tasks;
 using System.Web.Http;
-using GitDb.Core.Interfaces;
 using GitDb.Core.Model;
-using GitDb.Local;
 using Newtonsoft.Json;
 
 namespace GitDb.Sample.Controllers
 {
     public class PinController : ApiController
     {
-        static IGitDb _gitDb;
         readonly Author _author = new Author("kenneth", "truyers.kenneth@gmail.com");
-        public PinController()
-        {
-            if(_gitDb == null)
-                _gitDb = new LocalGitDb(ConfigurationManager.AppSettings["repoPath"], null, null, "kenneth", "truyers.kenneth@gmail.com", null, false);
-        }
 
         [Route("pins")]
         [HttpGet]
         public async Task<IHttpActionResult> Get([FromUri] string branch) =>
-            Ok(await _gitDb.GetFiles<Pin>(branch, "pins"));
+            Ok(await Git.Instance.GetFiles<Pin>(branch, "pins"));
 
         [Route("pins")]
         [HttpPost]
         public IHttpActionResult Post([FromUri] string branch, [FromBody] Pin pin)
         {
             pin.Id = Guid.NewGuid().ToString();
-            _gitDb.Save(branch, "Created pin " + pin.Name, new Document<Pin> {Key = "pins/" + pin.Id, Value = pin}, _author);
+            Git.Instance.Save(branch, "Created pin " + pin.Name, new Document<Pin> {Key = "pins/" + pin.Id, Value = pin}, _author);
             return Created("/pins/" + pin.Id, pin);
         }
 
@@ -37,7 +28,7 @@ namespace GitDb.Sample.Controllers
         [HttpPut]
         public IHttpActionResult Put([FromUri] string branch, [FromBody] Pin pin)
         {
-            _gitDb.Save(branch, "Created pin " + pin.Name, new Document<Pin> { Key = "pins/" + pin.Id, Value = pin }, _author);
+            Git.Instance.Save(branch, "Created pin " + pin.Name, new Document<Pin> { Key = "pins/" + pin.Id, Value = pin }, _author);
             return Ok();
         }
 
@@ -45,14 +36,14 @@ namespace GitDb.Sample.Controllers
         [HttpDelete]
         public IHttpActionResult Delete([FromUri] string branch, [FromUri] string id)
         {
-            _gitDb.Delete(branch, "pins/" + id, "Deleted pin with id " + id, _author);
+            Git.Instance.Delete(branch, "pins/" + id, "Deleted pin with id " + id, _author);
             return Ok();
         }
 
         [Route("branch")]
         [HttpGet]
         public async Task<IHttpActionResult> GetBranches() =>
-            Ok(await _gitDb.GetAllBranches());
+            Ok(await Git.Instance.GetAllBranches());
     }
 
     public class Pin
